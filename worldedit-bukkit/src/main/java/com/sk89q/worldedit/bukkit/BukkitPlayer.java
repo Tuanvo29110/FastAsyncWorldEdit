@@ -249,7 +249,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 pos.z(),
                 yaw,
                 pitch
-        )));
+        )).join());
     }
 
     @Override
@@ -363,7 +363,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public boolean setLocation(com.sk89q.worldedit.util.Location location) {
-        return player.teleportAsync(BukkitAdapter.adapt(location));
+        return player.teleportAsync(BukkitAdapter.adapt(location)).join();
     }
 
     @Override
