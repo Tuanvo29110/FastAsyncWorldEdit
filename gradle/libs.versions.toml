@@ -6,6 +6,7 @@ guava = "31.1-jre"
 log4j = "2.19.0"
 gson = "2.10"
 snakeyaml = "2.0"
+universalscheduler = "0.1.7"
 
 # Plugins
 dummypermscompat = "1.10"
@@ -62,6 +63,7 @@ log4jApi = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" }
+universalscheduler = { group = "com.github.Anon8281", name = "UniversalScheduler", version.ref = "universalscheduler" }
 
 # Plugins
 dummypermscompat = { group = "com.sk89q", name = "dummypermscompat", version.ref = "dummypermscompat" }
