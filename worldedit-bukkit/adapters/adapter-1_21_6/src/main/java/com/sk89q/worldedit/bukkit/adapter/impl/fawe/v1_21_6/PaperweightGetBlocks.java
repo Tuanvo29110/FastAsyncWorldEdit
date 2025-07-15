@@ -199,27 +199,12 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
     @Override
     public FaweCompoundTag tile(final int x, final int y, final int z) {
-        LevelChunk chunk = getSafeChunk();
-        if (chunk == null) return null;
-        BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
-                chunkX << 4), y, (z & 15) + (
-                chunkZ << 4)));
-        if (blockEntity == null) {
-            return null;
-        }
-        return NMS_TO_TILE.apply(blockEntity);
-
+        return null;
     }
 
     @Override
     public Map<BlockVector3, FaweCompoundTag> tiles() {
-        LevelChunk chunk = getSafeChunk();
-        if (chunk == null) return Collections.emptyMap();
-        Map<BlockPos, BlockEntity> nmsTiles = getChunk().getBlockEntities();
-        if (nmsTiles.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return AdaptedMap.immutable(nmsTiles, posNms2We, NMS_TO_TILE);
+        return Collections.emptyMap();
     }
 
     @Override
@@ -906,12 +891,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             }
         }
         return tmp;
-    }
-
-    private LevelChunk getSafeChunk() {
-        LevelChunk chunk = getChunk();
-        if (chunk == null || chunk.getLevel() == null) return null;
-        return chunk;
     }
 
     public LevelChunk getChunk() {
