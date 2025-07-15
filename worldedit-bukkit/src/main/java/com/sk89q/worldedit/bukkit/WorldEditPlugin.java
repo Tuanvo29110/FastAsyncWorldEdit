@@ -81,6 +81,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.enginehub.piston.CommandManager;
 import org.incendo.serverlib.ServerLib;
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -110,6 +112,7 @@ public class WorldEditPlugin extends JavaPlugin {
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
     private static final int BSTATS_ID = 1403;
+    private static TaskScheduler scheduler;
 
     private final SimpleLifecycled<BukkitImplAdapter> adapter =
             SimpleLifecycled.invalid();
@@ -234,6 +237,7 @@ public class WorldEditPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        scheduler = UniversalScheduler.getScheduler(this);
 
         // Catch bad things being done by naughty plugins that include
         // WorldEdit's classes
@@ -749,6 +753,9 @@ public class WorldEditPlugin extends JavaPlugin {
             event.setHandled(true);
         }
 
+    }
+    public static TaskScheduler getScheduler() {
+        return scheduler;
     }
 
 }
