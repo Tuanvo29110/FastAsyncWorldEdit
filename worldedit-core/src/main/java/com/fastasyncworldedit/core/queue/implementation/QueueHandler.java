@@ -19,6 +19,8 @@ import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.ApiStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -42,7 +44,7 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class QueueHandler implements Trimable, Runnable {
-
+    private static final Logger LOGGER = LogManager.getLogger(QueueHandler.class);
     /**
      * Primary queue should be used for tasks that are unlikely to wait on other tasks, IO, etc. (i.e. spend most of their
      * time utilising CPU.
