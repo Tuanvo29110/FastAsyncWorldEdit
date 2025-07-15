@@ -16,27 +16,29 @@ public class BukkitTaskManager extends TaskManager {
 
     @Override
     public int repeat(@Nonnull final Runnable runnable, final int interval) {
-        return WorldEditPlugin.getScheduler().runTaskTimer(this.plugin, runnable, interval, interval);
+        WorldEditPlugin.getScheduler().runTaskTimer(this.plugin, runnable, interval, interval);
+        return (int) (Math.random() * 10000) + 1;
     }
 
     @Override
     public int repeatAsync(@Nonnull final Runnable runnable, final int interval) {
-        return WorldEditPlugin.getScheduler().runTaskTimerAsynchronously(this.plugin, runnable, interval, interval);
+        WorldEditPlugin.getScheduler().runTaskTimerAsynchronously(this.plugin, runnable, interval, interval);
+        return (int) (Math.random() * 10000) + 1;
     }
 
     @Override
     public void async(@Nonnull final Runnable runnable) {
-        WorldEditPlugin.getScheduler().runTaskAsynchronously(this.plugin, runnable).getTaskId();
+        WorldEditPlugin.getScheduler().runTaskAsynchronously(this.plugin, runnable);
     }
 
     @Override
     public void task(@Nonnull final Runnable runnable) {
-        WorldEditPlugin.getScheduler().runTask(this.plugin, runnable).getTaskId();
+        WorldEditPlugin.getScheduler().runTask(this.plugin, runnable);
     }
 
     @Override
     public void later(@Nonnull final Runnable runnable, final int delay) {
-        WorldEditPlugin.getScheduler().runTaskLater(this.plugin, runnable, delay).getTaskId();
+        WorldEditPlugin.getScheduler().runTaskLater(this.plugin, runnable, delay);
     }
 
     @Override
