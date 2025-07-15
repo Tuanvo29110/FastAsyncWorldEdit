@@ -353,7 +353,49 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     @SuppressWarnings("deprecation")
     public static void sendChunk(IntPair pair, ServerLevel nmsWorld, int chunkX, int chunkZ) {
-        // In Folia, chunk sending is managed by the region system
+        ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
+        if (chunkHolder == null) {
+            return;
+        }
+        LevelChunk levelChunk;
+        if (PaperLib.isPaper()) {
+            // getChunkAtIfLoadedImmediately is paper only
+            levelChunk = nmsWorld.getChunkSource().getChunkAtIfLoadedImmediately(chunkX, chunkZ);
+        } else {
+            levelChunk = chunkHolder.getTickingChunkFuture().getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK).orElse(null);
+        }
+        if (levelChunk == null) {
+            return;
+        }
+        StampLockHolder lockHolder = new StampLockHolder();
+        NMSAdapter.beginChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
+        if (lockHolder.chunkLock == null) {
+            return;
+        }
+        try {
+            ChunkPos pos = levelChunk.getPos();
+            ClientboundLevelChunkWithLightPacket packet;
+            if (PaperLib.isPaper()) {
+                packet = new ClientboundLevelChunkWithLightPacket(
+                        levelChunk,
+                        nmsWorld.getLightEngine(),
+                        null,
+                        null,
+                        false // last false is to not bother with x-ray
+                );
+            } else {
+                // deprecated on paper - deprecation suppressed
+                packet = new ClientboundLevelChunkWithLightPacket(
+                        levelChunk,
+                        nmsWorld.getLightEngine(),
+                        null,
+                        null
+                );
+            }
+            nearbyPlayers(nmsWorld, pos).forEach(p -> p.connection.send(packet));
+        } finally {
+            NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
+        }
     }
 
     private static List<ServerPlayer> nearbyPlayers(ServerLevel serverLevel, ChunkPos coordIntPair) {
