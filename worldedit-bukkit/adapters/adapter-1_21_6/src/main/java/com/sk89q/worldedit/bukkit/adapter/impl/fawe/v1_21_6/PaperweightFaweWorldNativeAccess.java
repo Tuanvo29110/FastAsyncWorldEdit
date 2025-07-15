@@ -53,7 +53,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
     };
     private final PaperweightFaweAdapter paperweightFaweAdapter;
     private final WeakReference<Level> level;
-    private final AtomicInteger lastTick;
+    private final AtomicLong lastTick;
     private final Set<CachedChange> cachedChanges = new HashSet<>();
     private final Set<IntPair> cachedChunksToSend = new HashSet<>();
     private SideEffectSet sideEffectSet;
