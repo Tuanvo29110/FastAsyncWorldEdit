@@ -913,7 +913,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         if (chunk == null) return null;
         if (chunk.getLevel().getCurrentWorldData() == null) return null;
         return chunk;
-}
+    }
 
     public LevelChunk getChunk() {
         LevelChunk levelChunk = this.levelChunk;
