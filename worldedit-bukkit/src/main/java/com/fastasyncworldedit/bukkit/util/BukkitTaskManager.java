@@ -52,7 +52,7 @@ public class BukkitTaskManager extends TaskManager {
         try {
             Bukkit.getScheduler().cancelTask(task);
         } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, "Error cancelling FAWE task in Folia", e);
+            Bukkit.getLogger().warning("Error cancelling FAWE task in Folia");
         }
     }
 
