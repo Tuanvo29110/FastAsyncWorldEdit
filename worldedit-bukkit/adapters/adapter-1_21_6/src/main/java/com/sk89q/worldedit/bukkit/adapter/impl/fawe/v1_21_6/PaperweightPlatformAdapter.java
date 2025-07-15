@@ -353,6 +353,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     @SuppressWarnings("deprecation")
     public static void sendChunk(IntPair pair, ServerLevel nmsWorld, int chunkX, int chunkZ) {
+        return;
         ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (chunkHolder == null) {
             return;
