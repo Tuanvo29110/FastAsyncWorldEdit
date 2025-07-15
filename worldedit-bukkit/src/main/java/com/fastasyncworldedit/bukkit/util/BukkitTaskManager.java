@@ -3,14 +3,15 @@ package com.fastasyncworldedit.bukkit.util;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.fastasyncworldedit.core.util.TaskManager;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 
 public class BukkitTaskManager extends TaskManager {
 
-    private final WorldEditPlugin plugin;
+    private final Plugin plugin;
 
-    public BukkitTaskManager(final WorldEditPlugin plugin) {
+    public BukkitTaskManager(final Plugin plugin) {
         this.plugin = plugin;
     }
 
