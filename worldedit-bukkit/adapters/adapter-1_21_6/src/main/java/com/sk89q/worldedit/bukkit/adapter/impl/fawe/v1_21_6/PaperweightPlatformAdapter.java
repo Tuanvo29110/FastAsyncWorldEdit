@@ -37,6 +37,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.util.ZeroBitStorage;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
