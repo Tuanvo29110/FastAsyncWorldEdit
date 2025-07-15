@@ -112,6 +112,7 @@ dependencies {
     compileOnly(libs.plotSquaredCore) { isTransitive = false }
 
     // Third party
+    implementation(libs.universalscheduler)
     implementation(libs.paperlib)
     implementation(libs.bstatsBukkit) { isTransitive = false }
     implementation(libs.bstatsBase) { isTransitive = false }
