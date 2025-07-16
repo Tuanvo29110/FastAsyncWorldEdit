@@ -196,23 +196,12 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
     @Override
     public FaweCompoundTag tile(final int x, final int y, final int z) {
-        BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
-                chunkX << 4), y, (z & 15) + (
-                chunkZ << 4)));
-        if (blockEntity == null) {
-            return null;
-        }
-        return NMS_TO_TILE.apply(blockEntity);
-
+        return null;
     }
 
     @Override
     public Map<BlockVector3, FaweCompoundTag> tiles() {
-        Map<BlockPos, BlockEntity> nmsTiles = getChunk().getBlockEntities();
-        if (nmsTiles.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return AdaptedMap.immutable(nmsTiles, posNms2We, NMS_TO_TILE);
+        return Collections.emptyMap();
     }
 
     @Override
@@ -1039,50 +1028,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 }
             }
             return true;
-        }
-    }
-
-    public void ensureLoaded(int x, int z) {
-        try {
-            // Check if we're running on Folia
-            boolean isFolia = false;
-            try {
-                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-                isFolia = true;
-            } catch (ClassNotFoundException e) {
-                // Not Folia
-            }
-            
-            if (isFolia) {
-                // For Folia, we need to be careful about thread access
-                // Wait for the chunk to load properly without causing thread exceptions
-                try {
-                    CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(x, z, true);
-                    if (future.isDone() && !future.isCompletedExceptionally()) {
-                        org.bukkit.Chunk bukkitChunk = future.get();
-                        if (bukkitChunk != null) {
-                            levelChunk = (LevelChunk) ((org.bukkit.craftbukkit.CraftChunk) bukkitChunk).getHandle(net.minecraft.world.level.chunk.status.ChunkStatus.FULL);
-                        }
-                    }
-                    // If the future isn't done, we'll just continue without the chunk
-                    // The parent operation will need to handle this appropriately
-                } catch (Exception e) {
-                    LOGGER.warn("Error loading chunk asynchronously in Folia", e);
-                }
-                return;
-            }
-
-            // Traditional chunk loading for non-Folia servers
-            CompletableFuture<LevelChunk> future = PaperweightPlatformAdapter.ensureLoaded(serverLevel, x, z);
-            if (future.isDone() && !future.isCompletedExceptionally()) {
-                try {
-                    levelChunk = future.get();
-                } catch (Exception e) {
-                    LOGGER.warn("Error getting chunk from future", e);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Error ensuring chunk loaded", e);
         }
     }
 
