@@ -690,7 +690,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             }
 
             // set tiles
-            Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
+            Map<BlockVector3, FaweCompoundTag> tiles = Collections.emptyMap();
             if (tiles != null && !tiles.isEmpty()) {
                 if (syncTasks == null) {
                     syncTasks = new Runnable[1];
