@@ -33,10 +33,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<LevelChunk,
         net.minecraft.world.level.block.state.BlockState, BlockPos> {
@@ -53,9 +51,8 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
     };
     private final PaperweightFaweAdapter paperweightFaweAdapter;
     private final WeakReference<Level> level;
-    private final AtomicInteger lastTick;
-    private final Map<BlockPos, net.minecraft.world.level.block.state.BlockState> cachedChanges = new ConcurrentHashMap<>();
-    private final AtomicInteger tickCounter = new AtomicInteger(0);
+    private final AtomicLong lastTick;
+    private final Set<CachedChange> cachedChanges = new HashSet<>();
     private final Set<IntPair> cachedChunksToSend = new HashSet<>();
     private SideEffectSet sideEffectSet;
 
@@ -64,7 +61,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         this.level = level;
         // Use the actual tick as minecraft-defined so we don't try to force blocks into the world when the server's already lagging.
         //  - With the caveat that we don't want to have too many cached changed (1024) so we'd flush those at 1024 anyway.
-        this.lastTick = new AtomicInteger(0);
+        this.lastTick = new AtomicLong(System.currentTimeMillis() / 50L);
     }
 
     private Level getLevel() {
@@ -100,16 +97,21 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             LevelChunk levelChunk, BlockPos blockPos,
             net.minecraft.world.level.block.state.BlockState blockState
     ) {
-        int currentTick = lastTick.incrementAndGet();
+        int currentTick = MinecraftServer.currentTick;
         if (Fawe.isMainThread()) {
             return levelChunk.setBlockState(blockPos, blockState,
                     this.sideEffectSet != null && this.sideEffectSet.shouldApply(SideEffect.UPDATE)
             );
         }
-        cachedChanges.put(blockPos, blockState);
-        cachedChunksToSend.add(new IntPair(levelChunk.getPos().x, levelChunk.getPos().z));
-        if (cachedChanges.size() >= 1024) {
-            flushAsync(false);
+        // Since FAWE is.. Async we need to do it on the main thread (wooooo.. :( )
+        cachedChanges.add(new CachedChange(levelChunk, blockPos, blockState));
+        cachedChunksToSend.add(new IntPair(levelChunk.locX, levelChunk.locZ));
+        boolean nextTick = lastTick.get() > currentTick;
+        if (nextTick || cachedChanges.size() >= 1024) {
+            if (nextTick) {
+                lastTick.set(currentTick);
+            }
+            flushAsync(nextTick);
         }
         return blockState;
     }
@@ -234,7 +236,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
     }
 
     private synchronized void flushAsync(final boolean sendChunks) {
-        final Map<BlockPos, net.minecraft.world.level.block.state.BlockState> changes = new HashMap<>(cachedChanges);
+        final Set<CachedChange> changes = Set.copyOf(cachedChanges);
         cachedChanges.clear();
         final Set<IntPair> toSend;
         if (sendChunks) {
@@ -246,15 +248,9 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         RunnableVal<Object> runnableVal = new RunnableVal<>() {
             @Override
             public void run(Object value) {
-                changes.forEach((pos, state) -> {
-                    // Get the chunk for this position
-                    int chunkX = pos.getX() >> 4;
-                    int chunkZ = pos.getZ() >> 4;
-                    LevelChunk chunk = getLevel().getChunk(chunkX, chunkZ);
-                    chunk.setBlockState(pos, state,
-                            sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)
-                    );
-                });
+                changes.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
+                        sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)
+                ));
                 if (!sendChunks) {
                     return;
                 }
@@ -271,15 +267,9 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         RunnableVal<Object> runnableVal = new RunnableVal<>() {
             @Override
             public void run(Object value) {
-                cachedChanges.forEach((pos, state) -> {
-                    // Get the chunk for this position
-                    int chunkX = pos.getX() >> 4;
-                    int chunkZ = pos.getZ() >> 4;
-                    LevelChunk chunk = getLevel().getChunk(chunkX, chunkZ);
-                    chunk.setBlockState(pos, state,
-                            sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)
-                    );
-                });
+                cachedChanges.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
+                        sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)
+                ));
                 for (IntPair chunk : cachedChunksToSend) {
                     PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
                 }
@@ -292,6 +282,14 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         }
         cachedChanges.clear();
         cachedChunksToSend.clear();
+    }
+
+    private record CachedChange(
+            LevelChunk levelChunk,
+            BlockPos blockPos,
+            net.minecraft.world.level.block.state.BlockState blockState
+    ) {
+
     }
 
 }
