@@ -1,12 +1,11 @@
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import java.net.URI
 import java.time.format.DateTimeFormatter
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
+    id("com.gradleup.nmcp.aggregation") version "1.0.2"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
@@ -34,7 +33,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("2.13.1")
+var rootVersion by extra("2.13.2")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
@@ -104,11 +103,12 @@ tasks {
     }
 }
 
-nexusPublishing {
-    this.repositories {
-        sonatype {
-            nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
+nmcpAggregation {
+    centralPortal {
+        publishingType = "AUTOMATIC"
+        username = providers.gradleProperty("mavenCentralUsername")
+        password = providers.gradleProperty("mavenCentralPassword")
     }
+
+    publishAllProjectsProbablyBreakingProjectIsolation()
 }

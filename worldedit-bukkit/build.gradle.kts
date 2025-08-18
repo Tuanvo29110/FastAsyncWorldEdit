@@ -103,7 +103,6 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    compileOnly(libs.mapmanager) { isTransitive = false }
     compileOnly(libs.griefprevention) { isTransitive = false }
     compileOnly(libs.griefdefender) { isTransitive = false }
     compileOnly(libs.residence) { isTransitive = false }
@@ -247,13 +246,13 @@ publishMods {
     val common = modrinthOptions {
         accessToken.set(System.getenv("MODRINTH_TOKEN"))
         projectId.set("z4HZZnLr")
-        projectDescription.set(rootProject.file("README.md").readText())
+        projectDescription.set(providers.fileContents { layout.projectDirectory.file("README.md") as File }.asText)
     }
 
     // We publish the reobfJar twice to ensure that the modrinth download menu picks the right jar for the platform regardless
     // of minecraft version.
 
-    val mojmapPaperVersions = listOf("1.20.6", "1.21.1", "1.21.4")
+    val mojmapPaperVersions = listOf("1.20.6", "1.21.7", "1.21.8")
     val spigotMappedPaperVersions = listOf("1.20.2", "1.20.4")
 
     // Mark reobfJar as spigot only for 1.20.5+

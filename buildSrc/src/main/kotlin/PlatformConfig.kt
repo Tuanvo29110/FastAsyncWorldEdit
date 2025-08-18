@@ -20,6 +20,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "java")
     apply(plugin = "eclipse")
     apply(plugin = "idea")
+    apply(plugin = "com.gradleup.nmcp.aggregation")
     apply(plugin = "maven-publish")
     apply(plugin = "com.gradleup.shadow")
     apply(plugin = "signing")
@@ -67,7 +68,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
                 group = "com.fastasyncworldedit"
                 artifactId = "${rootProject.name}-${project.description}"
-                version = version
+                version = "$version"
 
                 pom {
                     name.set("${rootProject.name}-${project.description}" + " " + project.version)
@@ -111,7 +112,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
                         tag.set("${project.version}")
                     }
 
-                    issueManagement{
+                    issueManagement {
                         system.set("GitHub")
                         url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit/issues")
                     }
