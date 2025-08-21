@@ -219,6 +219,9 @@ tasks.withType<ShadowJar>().configureEach {
         relocate("org.anarres", "com.fastasyncworldedit.core.internal.io") {
             include(dependency("org.anarres:parallelgzip:1.0.5"))
         }
+        relocate("com.github.Anon8281.universalScheduler", "com.fastasyncworldedit.core.universalScheduler") {
+            include(dependency("com.github.Anon8281:UniversalScheduler:0.1.7"))
+        }
     }
 
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
