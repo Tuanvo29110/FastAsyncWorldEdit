@@ -10,13 +10,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@v5
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: graalvm
           cache: gradle
           java-version: 21
+          
       - name: Clean Build
         run: ./gradlew clean build --no-daemon
         
