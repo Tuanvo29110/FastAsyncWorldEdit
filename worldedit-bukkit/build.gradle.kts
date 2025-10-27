@@ -33,11 +33,6 @@ repositories {
     maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
-        content {
-            includeGroup("com.github.Zrips")
-            includeGroup("com.github.MilkBowl")
-            includeGroup("com.github.TechFortress")
-        }
     }
     maven {
         name = "GriefDefender"
